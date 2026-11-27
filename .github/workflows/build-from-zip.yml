@@ -21,6 +21,18 @@ jobs:
         run: |
           mkdir -p source
           unzip -q 26wrapped-github-ready.zip -d source
+      - name: Apply photo reveal fix
+        working-directory: .
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('source/www/index.html')
+          s = p.read_text()
+          start = s.index('<script>') + len('<script>')
+          end = s.index('</script>', start)
+          p.write_text(s[:start] + '\n' + Path('fixes/photo-reveal.js').read_text() + '\n' + s[end:])
+          PY
+          node --check fixes/photo-reveal.js
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
