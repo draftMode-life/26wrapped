@@ -6,6 +6,7 @@ on:
     paths:
       - '26wrapped-github-ready.zip'
       - '.github/workflows/build-from-zip.yml'
+      - 'fixes/**'
 permissions:
   contents: read
 jobs:
@@ -38,9 +39,9 @@ jobs:
           p = Path('source/native/CameraRollPlugin.java')
           s = p.read_text()
           old = 'Bitmap b;if(Build.VERSION.SDK_INT>=28){'
-          new = 'Bitmap b=null;if(Build.VERSION.SDK_INT>=29){try{b=getContext().getContentResolver().loadThumbnail(u,new android.util.Size(1000,1000),null);}catch(Exception ignored){}}if(b==null){if(Build.VERSION.SDK_INT>=28){'
+          new = 'Bitmap b=null;if(Build.VERSION.SDK_INT>=29){try{b=getContext().getContentResolver().loadThumbnail(u,new android.util.Size(1800,1800),null);}catch(Exception ignored){}}if(b==null){if(Build.VERSION.SDK_INT>=28){'
           assert old in s
-          s = s.replace(old,new).replace('else{continue;}ByteArrayOutputStream','else{continue;}}ByteArrayOutputStream').replace('JPEG,88,out','JPEG,82,out')
+          s = s.replace(old,new).replace('else{continue;}ByteArrayOutputStream','else{continue;}}ByteArrayOutputStream').replace('JPEG,88,out','JPEG,95,out')
           p.write_text(s)
           PY
       - uses: actions/setup-node@v4
