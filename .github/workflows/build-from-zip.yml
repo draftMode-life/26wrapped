@@ -32,8 +32,10 @@ jobs:
         run: |
           echo "ANDROID_HOME=$ANDROID_HOME"
           test -d "$ANDROID_HOME"
-          command -v sdkmanager
           ls "$ANDROID_HOME/platforms"
+          ls "$ANDROID_HOME/build-tools"
+          SDKMANAGER=$(find "$ANDROID_HOME/cmdline-tools" -name sdkmanager -type f | head -n 1)
+          if [ -n "$SDKMANAGER" ]; then dirname "$SDKMANAGER" >> "$GITHUB_PATH"; fi
       - name: Prepare Android project
         run: |
           npm install
