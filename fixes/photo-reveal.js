@@ -15,7 +15,7 @@ async function surprise(){
   const result=await timeout(bridge.randomPhotos(),90000,'Photo access timed out. Check permission in Android Settings and retry.');
   if(token!==run)return;
   if(!Array.isArray(result.photos)||result.photos.length!==12)throw Error('12 readable photos from 2026 are required.');
-  const c=document.createElement('canvas');c.width=1080;c.height=1440;const g=c.getContext('2d');g.fillStyle='#090909';g.fillRect(0,0,1080,1440);g.fillStyle='#eee';g.font='66px Georgia';g.fillText('My year. Uncurated.',42,95);g.font='22px monospace';g.fillStyle='#aaa';g.fillText('2026 / 12 RANDOM MEMORIES',44,135);
+  const c=document.createElement('canvas');c.width=2160;c.height=2880;const g=c.getContext('2d');g.scale(2,2);g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';g.fillStyle='#090909';g.fillRect(0,0,1080,1440);g.fillStyle='#eee';g.font='66px Georgia';g.fillText('My year. Uncurated.',42,95);g.font='22px monospace';g.fillStyle='#aaa';g.fillText('2026 / 12 RANDOM MEMORIES',44,135);
   for(let i=0;i<12;i++){
    if(token!==run)return;
    $('count').textContent='Loading memory '+(i+1)+' / 12';
@@ -28,7 +28,7 @@ async function surprise(){
   }
   if(token!==run)return;
   g.fillStyle='#eee';g.font='35px system-ui';g.fillText('26wrapped.',42,1392);g.fillStyle='#aaa';g.font='23px system-ui';g.textAlign='right';g.fillText('Surprise yourself.',1038,1392);
-  output=c.toDataURL('image/jpeg',.94);
+  output=c.toDataURL('image/jpeg',.96);
   const im=await image(output);if(token!==run)return;
   im.className='collage';im.alt='Your twelve-photo collage';$('frame').replaceChildren(im);$('heading').textContent='That was your year.';$('count').textContent='12 memories. One year.';$('results').hidden=false;$('notice').textContent='Check your collage before sharing.';
  }catch(e){if(token===run){$('count').textContent='Could not reveal memories.';$('notice').textContent=e.message||String(e);$('results').hidden=false;}}
