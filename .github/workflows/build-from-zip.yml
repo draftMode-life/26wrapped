@@ -1,0 +1,55 @@
+name: Build 26wrapped from ZIP
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '26wrapped-github-ready.zip'
+      - '.github/workflows/build-from-zip.yml'
+permissions:
+  contents: read
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: source
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract build kit
+        working-directory: .
+        run: |
+          mkdir -p source
+          unzip -q 26wrapped-github-ready.zip -d source
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - name: Prepare Android project
+        run: |
+          npm install
+          npx cap add android
+          python3 scripts/setup_android.py
+          npx cap sync android
+      - name: Build signed pilot APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleDebug
+      - name: Package APK and website
+        run: |
+          mkdir -p deploy
+          cp landing/index.html deploy/index.html
+          cp android/app/build/outputs/apk/debug/app-debug.apk deploy/26wrapped.apk
+          test -s deploy/26wrapped.apk
+          cd deploy && zip -r ../26wrapped-netlify.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 26wrapped-install-package
+          path: |
+            source/deploy/26wrapped.apk
+            source/26wrapped-netlify.zip
