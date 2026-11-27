@@ -31,17 +31,20 @@ jobs:
           s = p.read_text()
           start = s.index('<script>') + len('<script>')
           end = s.index('</script>', start)
-          p.write_text(s[:start] + '\n' + Path('fixes/photo-reveal.js').read_text() + '\n' + s[end:])
+          s = s[:start] + '\n' + Path('fixes/photo-reveal.js').read_text() + '\n' + s[end:]
+          s = s.replace('</style>', '#frame img{animation:none;transform:none;filter:none;image-rendering:auto;object-fit:contain}</style>', 1)
+          s = s.replace('90000,', '180000,')
+          p.write_text(s)
           PY
           node --check fixes/photo-reveal.js
           python3 - <<'PY'
           from pathlib import Path
           p = Path('source/native/CameraRollPlugin.java')
           s = p.read_text()
-          old = 'Bitmap b;if(Build.VERSION.SDK_INT>=28){'
-          new = 'Bitmap b=null;if(Build.VERSION.SDK_INT>=29){try{b=getContext().getContentResolver().loadThumbnail(u,new android.util.Size(1800,1800),null);}catch(Exception ignored){}}if(b==null){if(Build.VERSION.SDK_INT>=28){'
-          assert old in s
-          s = s.replace(old,new).replace('else{continue;}ByteArrayOutputStream','else{continue;}}ByteArrayOutputStream').replace('JPEG,88,out','JPEG,95,out')
+          assert '1000f/Math.max(w,h)' in s
+          assert 'JPEG,88,out' in s
+          s = s.replace('1000f/Math.max(w,h)', '3200f/Math.max(w,h)').replace('JPEG,88,out', 'JPEG,98,out')
+          s = s.replace('d.setAllocator(ImageDecoder.ALLOCATOR_SOFTWARE);', 'd.setAllocator(ImageDecoder.ALLOCATOR_SOFTWARE);d.setTargetColorSpace(ColorSpace.get(ColorSpace.Named.SRGB));')
           p.write_text(s)
           PY
       - uses: actions/setup-node@v4
